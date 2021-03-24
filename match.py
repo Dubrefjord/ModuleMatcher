@@ -2,9 +2,9 @@
 import sys
 import os
 import subprocess
-
 def attack_node(json):
   print("starting attack in wrapper")
+  #thread?
   attack = subprocess.run(['python3',str(attack_script), json], capture_output=True, text=True) #run ok because can wait until finish before comms.
   if attack.returncode==0:
     print(attack.args)
@@ -19,20 +19,34 @@ dir_path = os.path.dirname(os.path.realpath(__file__))
 #TODO test whether these exist or something
 crawl_script = dir_path+'/'+sys.argv[1]
 attack_script = dir_path+'/'+sys.argv[2]
+url = sys.argv[3]
 print("Wrapper running")
 node_file = open("node_file.txt","a")
-#Kör igång crawler
-print("starting crawler")
-crawler = subprocess.Popen(['python3',str(crawl_script)], stdout=subprocess.PIPE)
 
-for line in iter(crawler.stdout.readline,b''):
-  node_file.write(line.decode('utf-8')) # must be str
-  attack_node(line.decode('utf-8')) #Right now the attacks happen sequentially
-  #starta attackskript. TODO förbättring: sqlmap är slött. Bra att köra olika threads här!
+#Skapa pipes för kommunikation crawl --> MM
+matcher_read_fd, crawler_write_fd = os.pipe()
+crawler_read_fd, matcher_write_fd = os.pipe() #This currently isn't used, could probably remove in future. Not sure if it's possible to pass a dummy-value to pass_fds below.
+os.environ['matcher_read_fd'] = str(matcher_read_fd)
+os.environ['matcher_write_fd']= str(matcher_write_fd)
+os.environ['crawler_write_fd'] = str(crawler_write_fd)
+os.environ['crawler_read_fd']= str(crawler_read_fd)
+crawler_env = os.environ.copy()
+
+print("starting crawler")
+crawler = subprocess.Popen(['python3',str(crawl_script), url, '-M'], pass_fds=[crawler_read_fd, crawler_write_fd], env=crawler_env) #try with stdin
+os.close(crawler_read_fd)
+os.close(crawler_write_fd)
+
+crawler_output = open(matcher_read_fd,'r')
+for line in crawler_output:
+  print('output')
+  print(line)
+  node_file.write(line) # must be str
+  attack_node(line) #Right now the attacks happen sequentially
 node_file.close()
 
 
 
   # # TODO:
-    # Check whether we can collect something else than stdout-> PIPE. Would be nice to print only intended data to match.py 
+    # Check whether we can collect something else than stdout-> PIPE. Would be nice to print only intended data to match.py
     #Attacks in separate threads so that the slow sqlmap scripts can be run concurrently.
