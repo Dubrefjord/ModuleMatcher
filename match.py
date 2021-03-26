@@ -2,6 +2,9 @@
 import sys
 import os
 import subprocess
+import threading
+#import time
+
 def attack_node(json):
   print("starting attack in wrapper")
   #thread?
@@ -14,9 +17,10 @@ def attack_node(json):
     print(attack.args)
     print(attack.stderr)
 
+#tim = time.time()
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-#TODO test whether these exist or something
+#TODO test whether these exist or something. Use ArgumentParser like in bw Crawl
 crawl_script = dir_path+'/'+sys.argv[1]
 attack_script = dir_path+'/'+sys.argv[2]
 url = sys.argv[3]
@@ -38,14 +42,22 @@ os.close(crawler_read_fd)
 os.close(crawler_write_fd)
 
 crawler_output = open(matcher_read_fd,'r')
+threads = []
+
 for line in crawler_output:
-  print('output')
   print(line)
-  node_file.write(line) # must be str
-  attack_node(line) #Right now the attacks happen sequentially
+  node_file.write(line)
+  # TODO gör nedan i tråd!
+  t= threading.Thread(target=attack_node, args=[line])
+  t.start()
+  threads.append(t)
+
 node_file.close()
 
+for thread in threads:
+  thread.join()
 
+#print(time.time() - tim)
 
   # # TODO:
     # Check whether we can collect something else than stdout-> PIPE. Would be nice to print only intended data to match.py
