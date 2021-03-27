@@ -37,7 +37,7 @@ os.environ['crawler_read_fd']= str(crawler_read_fd)
 crawler_env = os.environ.copy()
 
 print("starting crawler")
-crawler = subprocess.Popen(['python3',str(crawl_script), url, '-M'], pass_fds=[crawler_read_fd, crawler_write_fd], env=crawler_env) #try with stdin
+crawler = subprocess.Popen(['python3',str(crawl_script) ,"--url" ,url, '--matcher'], pass_fds=[crawler_read_fd, crawler_write_fd], env=crawler_env, stdout=subprocess.DEVNULL) #try with stdin
 os.close(crawler_read_fd)
 os.close(crawler_write_fd)
 
@@ -45,7 +45,6 @@ crawler_output = open(matcher_read_fd,'r')
 threads = []
 
 for line in crawler_output:
-  print(line)
   node_file.write(line)
   # TODO gör nedan i tråd!
   t= threading.Thread(target=attack_node, args=[line])
@@ -53,7 +52,6 @@ for line in crawler_output:
   threads.append(t)
 
 node_file.close()
-
 for thread in threads:
   thread.join()
 
