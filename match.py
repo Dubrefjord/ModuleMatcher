@@ -16,6 +16,7 @@ def attack_node(json):
     print("ERROR OCCURED IN ATTACKSCRIPT FOR NODE")
     print(attack.args)
     print(attack.stderr)
+    print(attack.stdout)
 
 #tim = time.time()
 
@@ -25,7 +26,7 @@ crawl_script = dir_path+'/'+sys.argv[1]
 attack_script = dir_path+'/'+sys.argv[2]
 url = sys.argv[3]
 print("Wrapper running")
-node_file = open("node_file.txt","a")
+node_file = open("node_file.txt","w")
 
 #Skapa pipes för kommunikation crawl --> MM
 matcher_read_fd, crawler_write_fd = os.pipe()
@@ -44,10 +45,10 @@ os.close(crawler_write_fd)
 crawler_output = open(matcher_read_fd,'r')
 threads = []
 
-for line in crawler_output:
-  node_file.write(line)
+for json in crawler_output:
+  node_file.write(json)
   # TODO gör nedan i tråd!
-  t= threading.Thread(target=attack_node, args=[line])
+  t= threading.Thread(target=attack_node, args=[json])
   t.start()
   threads.append(t)
 

@@ -15,7 +15,9 @@ crawler_module
     crawl() -- sends attackable nodes continously (by txt or tcp). Returns list of sources and sinks.
 
 ----------------------------------------------------
-* Bygg in bw
++ Bygg in bw
 * Skriv attack_script
+    Varför blir json 'url' ist för "url"?
+    Flytta decode_json till match.py, om den behövs och ingen bättre buffering finns.
 * Bygg in attack_script
 * Definiera och speca interfacet.
