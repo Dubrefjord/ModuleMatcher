@@ -18,6 +18,20 @@ def attack_node(json):
     print(attack.stderr)
     print(attack.stdout)
 
+def custom_readlines(handle, line_separator="\n", chunk_size=64):
+    buf = ""  # storage buffer
+    while not handle.closed:  # while our handle is open
+        data = handle.read(chunk_size)  # read `chunk_size` sized data from the passed handle
+        if not data:  # no more data...
+            break  # break away...
+        buf += data  # add the collected data to the internal buffer
+        if line_separator in buf:  # we've encountered a separator
+            chunks = buf.split(line_separator)
+            buf = chunks.pop()  # keep the last entry in our buffer
+            for chunk in chunks:  # yield the rest
+                yield chunk + line_separator
+    if buf:
+        yield buf  # return the last buffer if any
 #tim = time.time()
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -45,9 +59,9 @@ os.close(crawler_write_fd)
 crawler_output = open(matcher_read_fd,'r')
 threads = []
 
-for json in crawler_output:
+for json in custom_readlines(crawler_output,"[[[JSON_DELIMITER_5345]]]",1):
+  json = json.replace('[[[JSON_DELIMITER_5345]]]','')
   node_file.write(json)
-  # TODO gör nedan i tråd!
   t= threading.Thread(target=attack_node, args=[json])
   t.start()
   threads.append(t)
@@ -57,7 +71,3 @@ for thread in threads:
   thread.join()
 
 #print(time.time() - tim)
-
-  # # TODO:
-    # Check whether we can collect something else than stdout-> PIPE. Would be nice to print only intended data to match.py
-    #Attacks in separate threads so that the slow sqlmap scripts can be run concurrently.
