@@ -59,8 +59,8 @@ os.close(crawler_write_fd)
 crawler_output = open(matcher_read_fd,'r')
 threads = []
 
-for json in custom_readlines(crawler_output,"[[[JSON_DELIMITER_5345]]]",1):
-  json = json.replace('[[[JSON_DELIMITER_5345]]]','')
+for json in custom_readlines(crawler_output,'\n',1):
+  json = json.replace('\n','')
   node_file.write(json)
   t= threading.Thread(target=attack_node, args=[json])
   t.start()
