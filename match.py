@@ -6,11 +6,10 @@ import threading
 #import time
 
 def attack_node(json):
-  print("starting attack in wrapper")
-  #thread?
+  #print("starting attack in wrapper")
   attack = subprocess.run(['python3',str(attack_script), json], capture_output=True, text=True) #run ok because can wait until finish before comms.
-  if attack.returncode==0:
-    print(attack.args)
+  if attack.returncode==0 and len(attack.stdout)>0:
+    #print(attack.args)
     print(attack.stdout)
   else:
     print("ERROR OCCURED IN ATTACKSCRIPT FOR NODE")
@@ -40,7 +39,7 @@ crawl_script = dir_path+'/'+sys.argv[1]
 attack_script = dir_path+'/'+sys.argv[2]
 url = sys.argv[3]
 print("Wrapper running")
-node_file = open("node_file.txt","w")
+node_file = open("node_file.txt","w+")
 
 #Skapa pipes för kommunikation crawl --> MM
 matcher_read_fd, crawler_write_fd = os.pipe()
@@ -58,11 +57,15 @@ os.close(crawler_write_fd)
 
 crawler_output = open(matcher_read_fd,'r')
 threads = []
+attacked_jsons = []
 
 for json in custom_readlines(crawler_output,'\n',1):
   json = json.replace('\n','')
-  node_file.write(json)
+  if json in attacked_jsons:
+      continue
+  node_file.write(json+"\n")
   t= threading.Thread(target=attack_node, args=[json])
+  attacked_jsons.append(json)
   t.start()
   threads.append(t)
 
