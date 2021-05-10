@@ -17,20 +17,20 @@ def attack_node(json):
     print(attack.stderr)
     print(attack.stdout)
 
-def custom_readlines(handle, line_separator="\n", chunk_size=64):
-    buf = ""  # storage buffer
-    while not handle.closed:  # while our handle is open
-        data = handle.read(chunk_size)  # read `chunk_size` sized data from the passed handle
-        if not data:  # no more data...
-            break  # break away...
-        buf += data  # add the collected data to the internal buffer
-        if line_separator in buf:  # we've encountered a separator
-            chunks = buf.split(line_separator)
-            buf = chunks.pop()  # keep the last entry in our buffer
-            for chunk in chunks:  # yield the rest
-                yield chunk + line_separator
-    if buf:
-        yield buf  # return the last buffer if any
+# def custom_readlines(handle, line_separator="\n", chunk_size=64):
+#     buf = ""  # storage buffer
+#     while not handle.closed:  # while our handle is open
+#         data = handle.read(chunk_size)  # read `chunk_size` sized data from the passed handle
+#         if not data:  # no more data...
+#             break  # break away...
+#         buf += data  # add the collected data to the internal buffer
+#         if line_separator in buf:  # we've encountered a separator
+#             chunks = buf.split(line_separator)
+#             buf = chunks.pop()  # keep the last entry in our buffer
+#             for chunk in chunks:  # yield the rest
+#                 yield chunk + line_separator
+#     if buf:
+#         yield buf  # return the last buffer if any
 #tim = time.time()
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
@@ -59,9 +59,10 @@ crawler_output = open(matcher_read_fd,'r')
 threads = []
 attacked_jsons = []
 
-for json in custom_readlines(crawler_output,'\n',1):
+#for json in custom_readlines(crawler_output,'\n',1):
+for json in crawler_output:
   json = json.replace('\n','')
-  if json in attacked_jsons:
+  if json in attacked_jsons: #Filter out duplicate nodes. If we want more advanced: for json in attacked_jsons: [jämför alla värden separat]
       continue
   node_file.write(json+"\n")
   t= threading.Thread(target=attack_node, args=[json])
