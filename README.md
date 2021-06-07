@@ -1,3 +1,7 @@
+This is the wrapper module in our master's thesis. The detection module can be found at https://github.com/Dubrefjord/attack_module_sql and the crawler can be found at https://github.com/mirdeger/bw.
+
+
+
 # Matcher
 Wrapper for modular black box web vulnerability scanner. Runnable with the command:
 
