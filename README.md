@@ -25,8 +25,8 @@ When being run in this manner, the crawler must save some file descriptors from 
 
 Furthermore, the crawler must send nodes to matcher as they are found, using the pipe we saved earler (write to self.crawler_pipe_output). Black Widow utilizes a navigation graph with edges in them, so in Black Widow we simply extract the nodes (according to specification covered later) and send them over the pipe. Example from the Black Widow code:
 ```python
+# send_node_data added by MATCHER-crew. Only run if matcher == True
 def send_node_data(edge, self):
-    print("Checking edge")
 
     cookies = extract_cookies_from_edge(edge)
     method = edge.value.method
@@ -34,14 +34,12 @@ def send_node_data(edge, self):
     parameters = []
     json_list = []
 
-
-    parameters = parameters + extract_parameters(edge)
-    for node in [edge.n1, edge.n2]:
+    for node in [edge.n1, edge.n2]: #extract param from the two nodes in the edge.
+      parameters = extract_parameters(node)
       json_node_data = {"url": node.value.url,
                         "parameters": ",".join(parameters),
                         "cookies": ",".join(cookies)}
       json_list.append(json_node_data)
-      print(json_node_data)
 
     if method == "form":
         data, parameters = extract_data_from_forms_in_edge(edge, self)
@@ -51,9 +49,8 @@ def send_node_data(edge, self):
                           "cookies": ",".join(cookies),
                           "method": edge.value.method_data.method}
         json_list.append(json_node_data)
-        print(json_node_data)
 
-    if matcher:
+    if self.matcher:
         for json_node_data in json_list:
           json_node_data = json.dumps(json_node_data)
           self.crawler_pipe_output.write(str(json_node_data))
