@@ -1,13 +1,11 @@
-#Mål: input match [kod med crawl()] [kod med attack()] URL
 import sys
 import os
 import subprocess
 import threading
-#import time
 
 def attack_node(json):
   #print("starting attack in wrapper")
-  attack = subprocess.run(['python3',str(attack_script), json], capture_output=True, text=True) #run ok because can wait until finish before comms.
+  attack = subprocess.run(['python3',str(attack_script), json], capture_output=True, text=True) #subproces.run is ok because can wait until the detection module is finished before writing to the user.
   if attack.returncode==0 and len(attack.stdout)>0:
     #print(attack.args)
     print(attack.stdout)
@@ -17,31 +15,16 @@ def attack_node(json):
     print(attack.stderr)
     print(attack.stdout)
 
-# def custom_readlines(handle, line_separator="\n", chunk_size=64):
-#     buf = ""  # storage buffer
-#     while not handle.closed:  # while our handle is open
-#         data = handle.read(chunk_size)  # read `chunk_size` sized data from the passed handle
-#         if not data:  # no more data...
-#             break  # break away...
-#         buf += data  # add the collected data to the internal buffer
-#         if line_separator in buf:  # we've encountered a separator
-#             chunks = buf.split(line_separator)
-#             buf = chunks.pop()  # keep the last entry in our buffer
-#             for chunk in chunks:  # yield the rest
-#                 yield chunk + line_separator
-#     if buf:
-#         yield buf  # return the last buffer if any
-#tim = time.time()
 
 dir_path = os.path.dirname(os.path.realpath(__file__))
-#TODO test whether these exist or something. Use ArgumentParser like in bw Crawl
+#TODO test whether these exist or something. Use ArgumentParser
 crawl_script = dir_path+'/'+sys.argv[1]
 attack_script = dir_path+'/'+sys.argv[2]
 url = sys.argv[3]
 print("Wrapper running")
 node_file = open("node_file.txt","w+")
 
-#Skapa pipes för kommunikation crawl --> MM
+#Create pipes for communication between crawler and wrapper
 matcher_read_fd, crawler_write_fd = os.pipe()
 crawler_read_fd, matcher_write_fd = os.pipe() #This currently isn't used, could probably remove in future. Not sure if it's possible to pass a dummy-value to pass_fds below.
 os.environ['matcher_read_fd'] = str(matcher_read_fd)
@@ -59,10 +42,9 @@ crawler_output = open(matcher_read_fd,'r')
 threads = []
 attacked_jsons = []
 
-#for json in custom_readlines(crawler_output,'\n',1):
 for json in crawler_output:
   json = json.replace('\n','')
-  if json in attacked_jsons: #Filter out duplicate nodes. If we want more advanced: for json in attacked_jsons: [jämför alla värden separat]
+  if json in attacked_jsons: #Filter out duplicate nodes. If we want more advanced filter that for example removes duplicates where the cookies are in a different order we can make a deep comparison of the received node and the onces in the node list here. However, this is probably good enough.
       continue
   node_file.write(json+"\n")
   t= threading.Thread(target=attack_node, args=[json])
@@ -73,5 +55,3 @@ for json in crawler_output:
 node_file.close()
 for thread in threads:
   thread.join()
-
-#print(time.time() - tim)
