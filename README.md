@@ -19,7 +19,7 @@ The web crawler must be runnable with the following command:
 
 When being run in this manner, the crawler must save some file descriptors from the environment. Example from when we made the Black Widow crawler compatible with ModuleMatcher (in python):
 ```python
-\# Get file descriptors for ModuleMatcher
+# Get file descriptors for ModuleMatcher
     if matcher:
         self.write_fd = int(os.environ['crawler_write_fd'])
         self.read_fd = int(os.environ['crawler_read_fd'])
