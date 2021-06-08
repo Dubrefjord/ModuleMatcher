@@ -65,10 +65,15 @@ def send_node_data(edge, self):
 The function showed above is ran every time Black Widow finds an edge in the web application (meaning a way to go from one node to the next). The important thing, however, is that the implementer finds a place in the crawler code where it can extract cookies, HTTP method, parameters and HTTP POST request data as soon as they are found, and send them over the pipe using the specified JSON node structure:
 
 json_node_data = {"url": [URL],
+
                           "parameters": ",".join(parameters),
+                          
                           "data": ",".join(data),
+                          
                           "cookies": ",".join(cookies),
+                          
                           "method": [HTTP Method]}
+                          
 
 # Making a detection module compatible with ModuleMatcher
 
