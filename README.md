@@ -9,7 +9,7 @@ python3 match.py [relative path from match.py --> crawler module] [relative path
 
 For this to work, the crawler module and the detection module must be compatible with the match.py interface. The requirements on both of them are as follows:
 
-#Making a web crawler compatible with matcher
+# Making a web crawler compatible with matcher
 
 An example of a crawler that has been made compatible with matcher already can be found at https://github.com/mirdeger/bw
 
@@ -64,7 +64,7 @@ def send_node_data(edge, self):
 
 The function showed above is ran every time Black Widow finds an edge in the web application (meaning a way to go from one node to the next). The important thing, however, is that the implementer finds a place in the crawler code where it can extract cookies, HTTP method, parameters and HTTP POST request data as soon as they are found.
 
-#Making a detection module compatible with matcher
+# Making a detection module compatible with matcher
 
 The detection module must be runnable with the following command:
 
