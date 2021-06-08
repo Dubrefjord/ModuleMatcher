@@ -1,4 +1,4 @@
-This is the wrapper module in our master's thesis. The detection module can be found at https://github.com/Dubrefjord/attack_module_sql and the crawler can be found at https://github.com/mirdeger/bw.
+This is the wrapper module in our master's thesis. The detection module can be found at https://github.com/Dubrefjord/attack_module_sql and the crawler can be found at https://github.com/mirdeger/bw. To create a new detection module, or modify a new crawler to be used with ModuleMatcher, follow the steps outlined below.
 
 
 
