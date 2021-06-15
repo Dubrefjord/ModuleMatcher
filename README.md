@@ -29,7 +29,6 @@ When being run in this manner, the crawler must save some file descriptors from 
 
 Furthermore, the crawler must send nodes to the wrapper as they are found, using the pipe we saved earler (write to self.crawler_pipe_output). Black Widow utilizes a navigation graph with edges in them, so in Black Widow we simply extract the nodes (according to specification covered later) and send them over the pipe. Example from the Black Widow code:
 ```python
-# send_node_data added by MATCHER-crew. Only run if matcher == True
 def send_node_data(edge, self):
 
     cookies = extract_cookies_from_edge(edge)
@@ -42,7 +41,10 @@ def send_node_data(edge, self):
       parameters = extract_parameters(node)
       json_node_data = {"url": node.value.url,
                         "parameters": ",".join(parameters),
-                        "cookies": ",".join(cookies)}
+                        "data": "",
+                        "cookies": ",".join(cookies),
+                        "method": ""}
+
       json_list.append(json_node_data)
 
     if method == "form":
